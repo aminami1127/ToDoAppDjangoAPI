@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 
@@ -8,6 +9,6 @@ class Task(models.Model):
         return self.name
 
     name = models.CharField(max_length=200)
-    date = models.DateTimeField()
+    date = models.DateTimeField(default=timezone.now())
     completed = models.BooleanField(default=False)
 
