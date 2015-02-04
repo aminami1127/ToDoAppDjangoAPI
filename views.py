@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from todo.models import Task
 from todo.serializers import TaskSerializer
+from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 
@@ -16,15 +17,14 @@ def JSONRespose(data, **kwargs):
     kwargs['content_type'] = 'application/json; charset="utf-8"'
     return HttpResponse(content, kwargs)
 
-
 @csrf_exempt
 def list(request):
     """
     List all Tasks or create new one
     """
     if request.method == 'GET':
-        task = Task.objects.all()
-        serializer = TaskSerializer(task, many=True)
+        tasks = Task.objects.all()
+        serializer = TaskSerializer(tasks, many=True)
         return JSONRespose(serializer.data)
 
     elif request.method == 'POST':
@@ -32,8 +32,9 @@ def list(request):
         serializer  = TaskSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return JSONRespose(serializer.data, status=201)
-        return JSONRespose(serializer.errors, status=400)
+            return JSONRespose(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return JSONRespose(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @csrf_exempt
 def detail(request, pk):
@@ -43,7 +44,7 @@ def detail(request, pk):
     try:
         task = Task.objects.get(pk=pk)
     except Task.DoesNotExist:
-        return HttpResponse(status=400)
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'GET':
         serializer =  TaskSerializer(task)
@@ -55,8 +56,8 @@ def detail(request, pk):
         if serializer.is_valid():
             serializer.save()
             return JSONRespose(serializer.data)
-        return JSONRespose(serializer.errors, status=400)
+        return JSONRespose(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         task.delete()
-        return HttpResponse(status=204)
+        return HttpResponse(status=status.HTTP_204_NO_CONTENT)
