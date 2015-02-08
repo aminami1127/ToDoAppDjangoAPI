@@ -6,9 +6,9 @@
     <link rel="stylesheet" href="{{ MEDIA_URL }}css/main.css">
 		<title>ToDoApp</title>
 
-		<script src="{{ MEDIA_URL }}js/underscore.js"></script>
-		<script src="{{ MEDIA_URL }}js/jquery.js"></script>
-		<script src="{{ MEDIA_URL }}js/backbone.js"></script>
+		<script src="{{ MEDIA_URL }}js/lib/underscore.js"></script>
+		<script src="{{ MEDIA_URL }}js/lib/jquery.js"></script>
+		<script src="{{ MEDIA_URL }}js/lib/backbone.js"></script>
 		<script src="{{ MEDIA_URL }}js/app.js"></script>
 	</head>
 	<body>
@@ -16,7 +16,7 @@
 		<h1>Tasks</h1>
 
 		<form class="form-inline" id="addTask">
-			<input type="text" id="title">
+			<input type="text" id="name">
 			<input class="btn btn-info"type="submit" value="Add" >
 			<span id="error"></span>
 		</form>
@@ -30,7 +30,7 @@
         <input type="checkbox" class="toggle"
            <%= completed ? 'checked' : '' %>>
 			<span class="<%= completed ? 'completed' : '' %>">
-				<%= title  %>
+				<%= name %>
 			</span>
       <span class="delete">
         <button class="btn-xs btn-success">delete</button>

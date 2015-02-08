@@ -1,46 +1,51 @@
+$.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+  options.url = 'http://127.0.0.1:8000/todo' + options.url;
+});
+
 $(document).ready(function(){
 
 	var Task = Backbone.Model.extend({
+    urlRoot: '/list',
 		defaults: {
-			title: 'do something',
+			name: 'do something',
 			completed: false,
 			timelimit: 'today'
 		},
-	    	validate: function(attrs){
-			if(_.isEmpty(attrs.title)){
-				return 'title must not be empty!';
+	  validate: function(attrs){
+			if(_.isEmpty(attrs.name)){
+				return 'name must not be empty!';
 			}
 		},
-	    	initialize: function(){
+	  initialize: function(){
 			this.on("invalid", function(model, error){
 				$('#error').html(error);
 			});
 		}
 	});
-	var Tasks = Backbone.Collection.extend({model: Task});
+	var Tasks = Backbone.Collection.extend({url: '/list', model: Task});
 
 	var TaskView = Backbone.View.extend({
 		tagName: 'li',
-	    	initialize: function(){
+	  initialize: function(){
 			this.model.on('destroy', this.remove, this);
 			this.model.on('change', this.render, this);
 		},
-	    	events: {
+	  events: {
 			'click .delete': 'destroy',
 			'click .toggle': 'change'
 		},
-	    	destroy: function(){
-			if(confirm('are you sure?')){
+	  destroy: function(){
+			if(confirm('Are you sure?')){
 				this.model.destroy();
 			}
 		},
-	    	remove: function(){
+	  remove: function(){
 			this.$el.remove();
 		},
-	    	change: function(){
+	  change: function(){
 			this.model.set('completed', !(this.model.get('completed')));
 		},
-	    	template: _.template($('#task-template').html()),
+	  template: _.template($('#task-template').html()),
 		render: function(){
 			var template = this.template(this.model.toJSON());
 			this.$el.html(template);
@@ -50,25 +55,25 @@ $(document).ready(function(){
 
 	var TasksView = Backbone.View.extend({
 		tagName: 'ul',
-	    	initialize: function(){
+	  initialize: function(){
 			this.collection.on('add', this.addNew, this);
 			this.collection.on('add', this.updateCount, this);
 			this.collection.on('change', this.updateCount, this);
 			this.collection.on('destroy', this.updateCount, this);
 		},
-	    	addNew: function(task){
+	  addNew: function(task){
 			var taskView = new TaskView({model: task});
 			this.$el.append(taskView.render().el);
-			$('#title').val('').focus();
+			$('#name').val('').focus();
 			return this;
 		},
-	    	updateCount: function(){
+	  updateCount: function(){
 			var uncompletedTasks = this.collection.filter(function(task){
 				return !(task.get('completed'));
 			});
 			$('#count').html(uncompletedTasks.length);
 		},
-	        render: function(){
+	  render: function(){
 			this.collection.each(function(task) {
 				var taskView = new TaskView({model: task});
 				this.$el.append(taskView.render().el);
@@ -83,31 +88,23 @@ $(document).ready(function(){
 	    	events: {
 			'submit': 'submit'
 		},
-	    	submit: function(e){
+	  submit: function(e){
 			e.preventDefault();
-			//var task = new Task({title: $('#title').val()})
+			//var task = new Task({name: $('#name').val()})
 			var task = new Task();
-			if(task.set({title: $('#title').val()}, {validate: true})){
+			if(task.set({name: $('#name').val()}, {validate: true})){
 				this.collection.add(task);
 				$('#error').empty();
 			}
 		}
 	});
 
-	var tasks = new Tasks([
-		{
-			title: "task1",
-			completed: true
-		},
-		{
-			title: "task2",
-		},
-		{
-			title: "task3",
-		}
-	]);
-
-	var tasksView = new TasksView({collection: tasks});
-	var addTaskView = new AddTaskView({collection: tasks});
-	$('#tasks').html(tasksView.render().el);
+	var tasks = new Tasks();
+  tasks.fetch({
+    success: function(tasks) {
+      var tasksView = new TasksView({collection: tasks});
+      var addTaskView = new AddTaskView({collection: tasks});
+      $('#tasks').html(tasksView.render().el);
+    }
+  })
 });

@@ -1,6 +1,6 @@
-from django.forms import widgets
 from rest_framework import serializers
 from todo.models import Task
+
 
 class TaskSerializer(serializers.ModelSerializer):
     """
@@ -18,7 +18,8 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
-        instance.date= validated_data.get('date', instance.date)
+        instance.date = validated_data.get('date', instance.date)
+        instance.completed = \
+            validated_data.get('completed', instance.completed)
         instance.save()
         return instance
-        instance.completed= validated_data.get('completed', instance.completed)
