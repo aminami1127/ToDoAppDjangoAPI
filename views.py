@@ -9,13 +9,20 @@ from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 
+
+def index(request):
+    return render(request, 'todo/index.html')
+
 """
 return HttpResponse as JSON from its content
 """
+
+
 def JSONRespose(data, **kwargs):
     content = JSONRenderer().render(data)
     kwargs['content_type'] = 'application/json; charset="utf-8"'
     return HttpResponse(content, kwargs)
+
 
 @csrf_exempt
 def list(request):
@@ -29,12 +36,14 @@ def list(request):
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
-        serializer  = TaskSerializer(data=data)
+        serializer = TaskSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return JSONRespose(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return JSONRespose(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return JSONRespose(serializer.errors,
+                               status=status.HTTP_400_BAD_REQUEST)
+
 
 @csrf_exempt
 def detail(request, pk):
@@ -47,7 +56,7 @@ def detail(request, pk):
         return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'GET':
-        serializer =  TaskSerializer(task)
+        serializer = TaskSerializer(task)
         return JSONRespose(serializer.data)
 
     elif request.method == 'PUT':
@@ -56,7 +65,8 @@ def detail(request, pk):
         if serializer.is_valid():
             serializer.save()
             return JSONRespose(serializer.data)
-        return JSONRespose(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JSONRespose(serializer.errors,
+                           status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         task.delete()
