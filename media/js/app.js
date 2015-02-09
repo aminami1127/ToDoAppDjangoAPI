@@ -5,15 +5,15 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
 $(document).ready(function(){
 
 	var Task = Backbone.Model.extend({
-    urlRoot: '/list/',
+    urlRoot: '/',
 		defaults: {
 			name: 'do something',
 			completed: false,
-			date: 'today'
+			date: '2015-02-10'
 		},
 	  validate: function(attrs){
 			if(_.isEmpty(attrs.name)){
-				return 'name must not be empty!';
+				return 'Name must not be empty!';
 			}
 		},
 	  initialize: function(){
@@ -62,6 +62,8 @@ $(document).ready(function(){
 			this.collection.on('destroy', this.updateCount, this);
 		},
 	  addNew: function(task){
+      task.url = '/list/';
+      task.save();
 			var taskView = new TaskView({model: task});
 			this.$el.append(taskView.render().el);
 			$('#name').val('').focus();
