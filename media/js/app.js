@@ -5,11 +5,11 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
 $(document).ready(function(){
 
 	var Task = Backbone.Model.extend({
-    urlRoot: '/list',
+    urlRoot: '/list/',
 		defaults: {
 			name: 'do something',
 			completed: false,
-			timelimit: 'today'
+			date: 'today'
 		},
 	  validate: function(attrs){
 			if(_.isEmpty(attrs.name)){
@@ -22,7 +22,7 @@ $(document).ready(function(){
 			});
 		}
 	});
-	var Tasks = Backbone.Collection.extend({url: '/list', model: Task});
+	var Tasks = Backbone.Collection.extend({url: '/list/', model: Task});
 
 	var TaskView = Backbone.View.extend({
 		tagName: 'li',

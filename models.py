@@ -10,5 +10,5 @@ class Task(models.Model):
         return self.name
 
     name = models.CharField(max_length=200)
-    date = models.DateTimeField(default=timezone.now())
+    date = models.DateField(default=timezone.now().date())
     completed = models.BooleanField(default=False)
